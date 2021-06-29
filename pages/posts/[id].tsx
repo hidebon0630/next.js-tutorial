@@ -3,8 +3,17 @@ import { getAllPostIds, getPostData } from '../../lib/posts'
 import Head from 'next/head'
 import Date from '../../components/date'
 import utilStyles from '../../styles/utils.module.css'
+import { GetStaticProps, GetStaticPaths } from 'next'
 
-export default function Post({ postData }) {
+export default function Post({
+  postData
+}: {
+  postData: {
+    title: string
+    date: string
+    contentHtml: string
+  }
+}) {
   return (
     <Layout>
       <Head>
@@ -20,21 +29,17 @@ export default function Post({ postData }) {
     </Layout>
   )
 }
-export async function getStaticPaths() {
+
+export const getStaticPaths: GetStaticPaths = async () => {
   const paths = getAllPostIds()
-  return [
-    {
-      params: {
-        // /posts/a/b/c を静的に生成する
-        id: ['a', 'b', 'c']
-      }
-    }
-  ]
+  return {
+    paths,
+    fallback: false
+  }
 }
 
-export async function getStaticProps({ params }) {
-  // "await" キーワードを以下のように追加する
-  const postData = await getPostData(params.id)
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const postData = await getPostData(params.id as string)
   return {
     props: {
       postData
